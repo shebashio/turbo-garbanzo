@@ -43,7 +43,7 @@ spec:
         # tag: "1.6.1"
 
         # Custom IB UBI8 Vault + HSM
-        repository: registry.dso.mil/kobayashi-maru/vault/vault_ent_hsm
+        repository: registry.dso.mil/kobayashi-maru/vault/vault-hsm
         tag: "v1.6.1"
         pullPolicy: Always
 
@@ -99,16 +99,16 @@ spec:
           name: customer-ca-crt
       
       # THIS IS BROKEN
-      volumeMounts:
-        - name: userconfig-cloudhsm-client-cfg
-          mountPath:  /opt/cloudhsm/etc/cloudhsm_client.cfg
-          subPath: cloudhsm_client.cfg
-        - name: userconfig-cloudhsm-mgmt-util-cfg
-          mountPath:  /opt/cloudhsm/etc/cloudhsm_mgmt_util.cfg
-          subPath: cloudhsm_mgmt_util.cfg
-        - name: userconfig-customer-ca-crt
-          mountPath:  /opt/cloudhsm/etc/customerCA.crt
-          subPath: customerCA.crt
+      # volumeMounts:
+      #   - name: userconfig-cloudhsm-client-cfg
+      #     mountPath:  /opt/cloudhsm/etc/cloudhsm_client.cfg
+      #     subPath: cloudhsm_client.cfg
+      #   - name: userconfig-cloudhsm-mgmt-util-cfg
+      #     mountPath:  /opt/cloudhsm/etc/cloudhsm_mgmt_util.cfg
+      #     subPath: cloudhsm_mgmt_util.cfg
+      #   - name: userconfig-customer-ca-crt
+      #     mountPath:  /opt/cloudhsm/etc/customerCA.crt
+      #     subPath: customerCA.crt
 
 
 
