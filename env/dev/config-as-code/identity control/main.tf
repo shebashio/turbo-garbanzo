@@ -82,10 +82,10 @@ module "userpass_israel" {
   identity_entity_policies = ["change-userpass-password"]
 }
 
-resource "vault_identity_group" "p1-int-notaries" {
-  name     = "p1-int-notaries"
+resource "vault_identity_group" "il5-p1-int-notaries" {
+  name     = "il5-p1-int-notaries"
   type     = "internal"
-  policies = ["p1-int-notary"]
+  policies = ["il5-p1-int-notaries"]
 
   member_entity_ids = [
     module.userpass_cam.vault_identity_entity_id,
@@ -139,9 +139,9 @@ resource "vault_policy" "kv-read" {
   policy = file("policies/kv-read.hcl")
 }
 
-resource "vault_policy" "p1-int-notary" {
-  name   = "p1-int-notary"
-  policy = file("policies/p1-int-notary.hcl")
+resource "vault_policy" "il5-p1-int-notary" {
+  name   = "il5-p1-int-notary"
+  policy = file("policies/il5-p1-int-notary.hcl")
 }
 
 resource "vault_policy" "control-group-authority" {

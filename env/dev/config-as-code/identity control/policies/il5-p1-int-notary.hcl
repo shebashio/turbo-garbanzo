@@ -14,7 +14,7 @@ path "pki/il5/p1_int/issue/p1-leaf-cert" {
   control_group = {
     factor "authorizer" {
       identity {
-        group_names = [ "p1-int-notaries" ]
+        group_names = [ "il5-p1-int-notaries" ]
         approvals   = 2
       }
     }
@@ -30,7 +30,7 @@ path "pki/il5/p1_int/sign/p1-leaf-cert" {
   control_group = {
     factor "authorizer" {
       identity {
-        group_names = [ "p1-int-notaries" ]
+        group_names = [ "il5-p1-int-notaries" ]
         approvals   = 2
       }
     }
