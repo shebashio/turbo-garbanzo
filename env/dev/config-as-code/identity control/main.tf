@@ -94,6 +94,30 @@ resource "vault_identity_group" "il5-p1-int-notaries" {
   ]
 }
 
+resource "vault_identity_group" "il4-p1-int-notaries" {
+  name     = "il4-p1-int-notaries"
+  type     = "internal"
+  policies = ["il4-p1-int-notaries"]
+
+  member_entity_ids = [
+    module.userpass_cam.vault_identity_entity_id,
+    module.userpass_gabe.vault_identity_entity_id,
+    module.userpass_israel.vault_identity_entity_id,
+  ]
+}
+
+resource "vault_identity_group" "il2-p1-int-notaries" {
+  name     = "il2-p1-int-notaries"
+  type     = "internal"
+  policies = ["il2-p1-int-notaries"]
+
+  member_entity_ids = [
+    module.userpass_cam.vault_identity_entity_id,
+    module.userpass_gabe.vault_identity_entity_id,
+    module.userpass_israel.vault_identity_entity_id,
+  ]
+}
+
 resource "vault_identity_group" "control-group-authorities" {
   name     = "control-group-authorities"
   type     = "internal"
@@ -126,22 +150,19 @@ resource "vault_identity_group" "vault-security-officers" {
   ]
 }
 
-resource "vault_identity_group" "kv-read" {
-  name     = "kv-readers"
-  type     = "internal"
-  policies = ["kv-read"]
-
-  member_entity_ids = []
-}
-
-resource "vault_policy" "kv-read" {
-  name   = "kv-read"
-  policy = file("policies/kv-read.hcl")
-}
-
 resource "vault_policy" "il5-p1-int-notary" {
   name   = "il5-p1-int-notary"
   policy = file("policies/il5-p1-int-notary.hcl")
+}
+
+resource "vault_policy" "il4-p1-int-notary" {
+  name   = "il4-p1-int-notary"
+  policy = file("policies/il4-p1-int-notary.hcl")
+}
+
+resource "vault_policy" "il2-p1-int-notary" {
+  name   = "il2-p1-int-notary"
+  policy = file("policies/il2-p1-int-notary.hcl")
 }
 
 resource "vault_policy" "control-group-authority" {
@@ -172,16 +193,4 @@ resource "vault_policy" "vault-security-officer" {
       group_id    = vault_identity_group.vault-security-officers.id
     }
   )
-}
-
-resource "vault_mount" "demo-kv" {
-  path = "demo-kv"
-  type = "kv"
-
-  seal_wrap               = var.enable_seal_wrap
-  external_entropy_access = var.enable_external_entropy_access
-
-  options = {
-    version = 1
-  }
 }
