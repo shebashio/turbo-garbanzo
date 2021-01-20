@@ -41,19 +41,6 @@ path "/pki/il5/p1_int/root/*" {
 }
 
 # -----------------------------------------------------------------------------
-# Deny all on any secret mounted under the secrets/ path, e.g.:
-#   secrets/kv/app-1
-#   secrets/aws/iam-admin
-# -----------------------------------------------------------------------------
-path "secrets/*" {
-  capabilities = ["deny"]
-}
-
-path "+/secrets/*" {
-  capabilities = ["deny"]
-}
-
-# -----------------------------------------------------------------------------
 # Manage identity secrets broadly across Vault (root namespace)
 # -----------------------------------------------------------------------------
 path "identity/*" {
@@ -115,19 +102,6 @@ path "/pki/il4/*" {
 path "/pki/il2/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
-
-path "/kv/il5/*" {
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
-path "/kv/il4/*" {
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
-path "/kv/il2/*" {
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
 
 # -----------------------------------------------------------------------------
 # Manage secret backends broadly across Vault (root namespace)
