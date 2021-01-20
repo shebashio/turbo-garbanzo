@@ -41,135 +41,156 @@ provider "vault" {
   }
 }
 
-resource "vault_identity_entity" "cameron_banowsky" {
-  name      = "pidof"
-  policies  = ["admin"]
-  disabled = false
+resource "vault_auth_backend" "userpass" {
+  type = "userpass"
+  tune {
+    default_lease_ttl = "12m"
+    max_lease_ttl     = "60m"
+  }
 }
 
-resource "vault_identity_entity" "israel_morales" {
-  name      = "imorales"
-  policies  = ["admin"]
-  disabled = false
+module "userpass_cam" {
+  depends_on = [vault_auth_backend.userpass]
+  source     = "./modules/userpass-user"
+
+  userpass_mount_accessor  = vault_auth_backend.userpass.accessor
+  userpass_username        = "cam"
+  userpass_password        = "hunter2"
+  identity_entity_name     = "pidof"
+  identity_entity_policies = ["change-userpass-password"]
 }
 
-resource "vault_identity_entity" "gabe_scarberry" {
-  name      = "gscarberry"
-  policies  = ["admin"]
-  disabled = false
+module "userpass_gabe" {
+  depends_on = [vault_auth_backend.userpass]
+  source     = "./modules/userpass-user"
+
+  userpass_mount_accessor  = vault_auth_backend.userpass.accessor
+  userpass_username        = "gabe"
+  userpass_password        = "hunter2"
+  identity_entity_name     = "gscarberry"
+  identity_entity_policies = ["change-userpass-password"]
 }
 
-resource "vault_identity_entity" "notary" {
-  name      = "notary"
-  policies  = ["p1_pki_int"]
-  disabled = false
+module "userpass_israel" {
+  depends_on = [vault_auth_backend.userpass]
+  source     = "./modules/userpass-user"
+
+  userpass_mount_accessor  = vault_auth_backend.userpass.accessor
+  userpass_username        = "israel"
+  userpass_password        = "hunter2"
+  identity_entity_name     = "imorales"
+  identity_entity_policies = ["change-userpass-password"]
 }
 
-resource "vault_identity_group" "admin" {
-  name     = "admin"
+resource "vault_identity_group" "il5-p1-int-notaries" {
+  name     = "il5-p1-int-notaries"
   type     = "internal"
-  policies = ["admin", "dev", "staging", "prod"]
+  policies = ["il5-p1-int-notaries"]
 
-  metadata = {
-    version = "2"
-  }
+  member_entity_ids = [
+    module.userpass_cam.vault_identity_entity_id,
+    module.userpass_gabe.vault_identity_entity_id,
+    module.userpass_israel.vault_identity_entity_id,
+  ]
 }
 
-resource "vault_identity_group_policies" "admin" {
-  policies = ["admin"]
-
-  group_id = vault_identity_group.internal.id
-}
-
-resource "vault_identity_group" "internal" {
-  name     = "internal"
+resource "vault_identity_group" "il4-p1-int-notaries" {
+  name     = "il4-p1-int-notaries"
   type     = "internal"
-  policies = ["dev", "staging", "prod"]
+  policies = ["il4-p1-int-notaries"]
+
+  member_entity_ids = [
+    module.userpass_cam.vault_identity_entity_id,
+    module.userpass_gabe.vault_identity_entity_id,
+    module.userpass_israel.vault_identity_entity_id,
+  ]
 }
 
-resource "vault_identity_group_policies" "internal" {
-  policies = ["internal"]
-
-  group_id = vault_identity_group.internal.id
-}
-
-resource "vault_identity_group" "dev" {
-  name     = "dev"
+resource "vault_identity_group" "il2-p1-int-notaries" {
+  name     = "il2-p1-int-notaries"
   type     = "internal"
-  policies = ["dev"]
+  policies = ["il2-p1-int-notaries"]
+
+  member_entity_ids = [
+    module.userpass_cam.vault_identity_entity_id,
+    module.userpass_gabe.vault_identity_entity_id,
+    module.userpass_israel.vault_identity_entity_id,
+  ]
 }
 
-resource "vault_identity_group_policies" "dev" {
-  policies = ["dev"]
-
-  exclusive = false
-
-  group_id = vault_identity_group.internal.id
-}
-
-resource "vault_identity_group" "p1_pki_int" {
-  name     = "p1_pki_int"
+resource "vault_identity_group" "control-group-authorities" {
+  name     = "control-group-authorities"
   type     = "internal"
-  policies = ["p1_pki_int"]
+  policies = ["control-group-authority"]
+
+  member_entity_ids = [
+    module.userpass_cam.vault_identity_entity_id,
+    module.userpass_gabe.vault_identity_entity_id,
+    module.userpass_israel.vault_identity_entity_id,
+  ]
 }
 
-resource "vault_identity_group_policies" "p1_pki_int" {
-  policies = ["p1_pki_int"]
+resource "vault_identity_group" "vault-operators" {
+  name     = "vault-operators"
+  type     = "internal"
+  policies = ["vault-operator"]
 
-  exclusive = false
-
-  group_id = vault_identity_group.p1_pki_int.id
+  member_entity_ids = []
 }
 
+resource "vault_identity_group" "vault-security-officers" {
+  name     = "vault-security-officers"
+  type     = "internal"
+  policies = ["vault-security-officer"]
 
-data "vault_policy_document" "admin" {
-  rule {
-    path         = ["secret/*", "pki/*"]
-    capabilities = ["create", "read", "update", "delete", "list"]
-    description  = "allow all on secrets under admin"
-  }
+  member_entity_ids = [
+    module.userpass_cam.vault_identity_entity_id,
+    module.userpass_gabe.vault_identity_entity_id,
+    module.userpass_israel.vault_identity_entity_id,
+  ]
 }
 
-resource "vault_policy" "admin" {
-  name     = "admin_policy"
-  policy   = data.vault_policy_document.vault_admin_secrets.hcl
+resource "vault_policy" "il5-p1-int-notary" {
+  name   = "il5-p1-int-notary"
+  policy = file("policies/il5-p1-int-notary.hcl")
 }
 
-data "vault_policy_document" "internal" {
-  rule {
-    path         = ["secret/dev*", "secret/staging/*", "secret/prod/*"]
-    capabilities = ["create", "read"]
-    description  = "allow create / read secrets for dev, staging and prod"
-  }
+resource "vault_policy" "il4-p1-int-notary" {
+  name   = "il4-p1-int-notary"
+  policy = file("policies/il4-p1-int-notary.hcl")
 }
 
-resource "vault_policy" "internal" {
-  name     = "internal_policy"
-  policy   = data.vault_policy_document.vault_internal_secrets.hcl
+resource "vault_policy" "il2-p1-int-notary" {
+  name   = "il2-p1-int-notary"
+  policy = file("policies/il2-p1-int-notary.hcl")
 }
 
-data "vault_policy_document" "dev" {
-  rule {
-    path         = ["secret/dev*"]
-    capabilities = ["create", "read"]
-    description  = "allow create / read secrets for dev"
-  }
+resource "vault_policy" "control-group-authority" {
+  name   = "control-group-authority"
+  policy = file("policies/control-group-authority.hcl")
 }
 
-resource "vault_policy" "dev" {
-  name     = "dev_policy"
-  policy   = data.vault_policy_document.vault_dev_secrets.hcl
+resource "vault_policy" "change-userpass-password" {
+  name = "change-userpass-password"
+  policy = templatefile("policies/change-userpass-password.hcl.tpl",
+    {
+      userpass_mount_accessor = vault_auth_backend.userpass.accessor
+    }
+  )
 }
 
-data "vault_policy_document" "p1_pki_int" {
-  rule {
-    path         = ["pki/p1_pki_int/sign/*"]
-    capabilities = ["create", "read"]
-    description  = "allow csr submission/signing to DoD P1 Intermediate CA"
-  }
+resource "vault_policy" "vault-operator" {
+  name   = "vault-operator"
+  policy = file("policies/vault-operator.hcl")
 }
 
-resource "vault_policy" "p1_pki_int" {
-  name     = "p1_pki_int_policy"
-  policy   = data.vault_policy_document.vault_dev_secrets.hcl
+resource "vault_policy" "vault-security-officer" {
+  name = "vault-security-officer"
+  policy = templatefile("policies/vault-security-officer.hcl.tpl",
+    {
+      policy_name = "vault-security-officer"
+      group_name  = vault_identity_group.vault-security-officers.name
+      group_id    = vault_identity_group.vault-security-officers.id
+    }
+  )
 }
