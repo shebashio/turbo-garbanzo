@@ -85,7 +85,7 @@ module "userpass_israel" {
 resource "vault_identity_group" "il5-p1-int-notaries" {
   name     = "il5-p1-int-notaries"
   type     = "internal"
-  policies = ["il5-p1-int-notaries"]
+  policies = ["il5-p1-int-notary"]
 
   member_entity_ids = [
     module.userpass_cam.vault_identity_entity_id,
@@ -97,7 +97,7 @@ resource "vault_identity_group" "il5-p1-int-notaries" {
 resource "vault_identity_group" "il4-p1-int-notaries" {
   name     = "il4-p1-int-notaries"
   type     = "internal"
-  policies = ["il4-p1-int-notaries"]
+  policies = ["il4-p1-int-notary"]
 
   member_entity_ids = [
     module.userpass_cam.vault_identity_entity_id,
@@ -109,7 +109,7 @@ resource "vault_identity_group" "il4-p1-int-notaries" {
 resource "vault_identity_group" "il2-p1-int-notaries" {
   name     = "il2-p1-int-notaries"
   type     = "internal"
-  policies = ["il2-p1-int-notaries"]
+  policies = ["il2-p1-int-notary"]
 
   member_entity_ids = [
     module.userpass_cam.vault_identity_entity_id,
