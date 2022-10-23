@@ -1,6 +1,6 @@
 #######  Global Stage ARGs
-ARG BASE_REGISTRY=docker.pkg.github.com
-ARG BASE_IMAGE=shebashio/turbo-garbanzo
+ARG BASE_REGISTRY=ghcr.io
+ARG BASE_IMAGE=shebashio/turbo-garbanzo/vault-hsm
 ARG BASE_TAG=vault
 
 ARG UBI_IMAGE=${BASE_REGISTRY}/${BASE_IMAGE}
