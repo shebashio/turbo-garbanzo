@@ -5,6 +5,7 @@ ARG BASE_TAG=vault
 
 ARG UBI_IMAGE=${BASE_REGISTRY}/${BASE_IMAGE}
 
+LABEL org.opencontainers.image.source = "https://github.com/shebashio/turbo-garbanzo"
 
 # Multi-stage builder to avoid polluting users environment with wrong
 # architecture binaries.  Since this binary is used in an alpine container,
